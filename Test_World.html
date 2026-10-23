@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCribe — Test World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FFF8EC;--card:#FFFFFF;--ink:#2B3A55;--ink-soft:#6B7A99;--sky:#3FB6E8;--sky-dark:#1D93C4;--sun:#FFC93C;--sun-dark:#E8A916;--grass:#2FC29A;--grass-dark:#1FA483;--coral:#FF6F61;--coral-dark:#E8503F;--grape:#9B7DE8;--grape-dark:#7C5BD1;--shadow:0 10px 24px rgba(43,58,85,0.12);}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;min-height:100vh;font-family:'Nunito',sans-serif;color:var(--ink);background:var(--paper);overflow-x:hidden;}
+.app{max-width:760px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+header{text-align:center;}
+h1{font-family:'Baloo 2';font-size:clamp(28px,6vw,42px);margin:0 0 4px;letter-spacing:-0.5px;}
+.sub{color:var(--ink-soft);font-weight:800;font-size:14px;}
+.feedback{margin-top:10px;font-weight:900;font-family:'Baloo 2';font-size:18px;min-height:24px;}
+.btn{font-family:inherit;border:none;cursor:pointer;border-radius:999px;font-weight:800;padding:12px 24px;font-size:15px;transition:all .15s;}
+.btn:active{transform:translateY(1px);}
+.home-btn{background:linear-gradient(135deg,var(--sky) 0%,var(--sky-dark) 100%);color:#fff;}
+.good{background:linear-gradient(135deg,var(--grass) 0%,var(--grass-dark) 100%);color:#fff;}
+.test-card{background:var(--card);border-radius:26px;padding:20px 14px 24px;box-shadow:var(--shadow,0 10px 24px rgba(43,58,85,0.12));text-align:center;min-height:520px;}
+.cat-pill{display:inline-block;background:#EEF3FA;color:var(--sky-dark);font-family:'Baloo 2';font-weight:800;font-size:13px;padding:6px 16px;border-radius:999px;margin-bottom:8px;border:1px solid rgba(43,58,85,0.04);}
+.qtext{font-family:'Baloo 2';font-size:clamp(56px,14vw,120px);font-weight:900;line-height:1;margin:16px 0;color:var(--ink);}
+.qhint{color:var(--ink-soft);font-weight:800;font-size:15px;margin-bottom:14px;}
+.trace-wrap{margin:14px 0;border:3px dashed #DCE6F0;border-radius:20px;background:#FBFCFE;padding:10px;display:flex;flex-direction:column;align-items:center;}
+.trace-box{width:100%;max-width:460px;height:330px;border-radius:14px;background:#fff;position:relative;overflow:hidden;border:2px solid #E3E8EE;}
+.trace-canvas{width:100%;height:100%;display:block;cursor:crosshair;}
+.trace-overlay{position:absolute;inset:0;pointer-events:none;}
+.guide{fill:none;stroke:#E3E8EE;stroke-width:12;stroke-linecap:round;stroke-linejoin:round;}
+.user{fill:none;stroke:var(--coral-dark);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;}
+.tip{fill:#3A2E26;stroke:var(--sun);stroke-width:3;pointer-events:none;}
+.clear-trace{background:#F0F3F5;color:var(--ink);font-weight:800;font-size:12px;padding:6px 14px;border-radius:999px;border:1px solid rgba(43,58,85,0.08);margin-top:8px;}
+.check-btn{background:linear-gradient(135deg,var(--sun) 0%,var(--sun-dark) 100%);color:#5b4200;font-size:17px;padding:14px 30px;box-shadow:0 4px 14px rgba(232,169,22,0.4);margin-top:10px;}
+.options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+.opt{background:#FBFCFE;border:2px solid #DCE6F0;border-radius:16px;font-weight:800;font-size:17px;padding:14px 6px;color:var(--ink);transition:all .15s;cursor:pointer;}
+.opt:hover{transform:translateY(-3px);border-color:var(--sky);box-shadow:var(--shadow);}
+.correct{background:var(--grass);border-color:var(--grass-dark);color:#fff;}
+.wrong{background:var(--coral);border-color:var(--coral-dark);color:#fff;}
+.scorebar{display:flex;align-items:center;gap:10px;margin-top:10px;font-family:'Baloo 2';font-weight:800;font-size:16px;}
+.score-dot{width:10px;height:10px;border-radius:50%;background:#D7DEE4;}
+.score-dot.done{background:var(--grass);} .score-dot.pass{background:var(--sun);}
+.score-text{font-weight:900;font-size:18px;}
+.controls{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.finish-card{max-width:520px;padding:40px 30px 30px;background:linear-gradient(135deg,var(--card) 0%,#FFF9F0 100%);border-radius:30px;box-shadow:var(--shadow);text-align:center;position:relative;overflow:hidden;}
+.confetti{position:absolute;inset:-40px;pointer-events:none;overflow:hidden;}
+.confetti-piece{position:absolute;top:-20px;font-size:22px;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(560px) rotate(720deg);opacity:0.2;}}
+.final-big{font-family:'Baloo 2';font-weight:900;font-size:clamp(40px,12vw,80px);color:var(--sun-dark);margin:8px 0;}
+.final-note{color:var(--ink-soft);font-weight:800;font-size:17px;}
+@media (prefers-reduced-motion:reduce){.confetti-piece{animation:none !important;}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <button class="btn home-btn" onclick="goHome()">🏠 Home</button>
+    <h1>🌍 Test World</h1>
+    <div class="sub">Test what you learned — trace &amp; answer!</div>
+  </header>
+
+  <section id="testScreen" class="test-card">
+    <div class="cat-pill" id="catPill">Letters</div>
+    <div class="scorebar"><span id="curDot" class="score-dot done"></span><span id="scoreText" class="score-text">0 / 5</span></div>
+    <div id="qArea"></div>
+    <div class="controls" id="ctrlArea"></div>
+  </section>
+
+  <section id="finishScreen" class="finish-card" style="display:none;">
+    <div class="confetti" id="confetti"></div>
+    <div style="font-size:64px;">🎉</div>
+    <div class="final-big" id="finalScore"></div>
+    <div class="final-note" id="finalNote"></div>
+    <div class="controls" style="margin-top:22px;">
+      <button class="btn good" onclick="resetTest()">Try Again</button>
+      <button class="btn home-btn" onclick="goHome()">Back Home</button>
+    </div>
+  </section>
+</div>
+<script>
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const NUMBERS = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+const SHAPES = ["Circle","Square","Triangle","Star","Heart","Oval","Diamond"];
+const COLORS = ["Red","Blue","Green","Yellow","Orange","Purple"];
+
+const CATEGORIES = [
+  {name:"Letters", pool:[...LETTERS], kind:"trace", color:"var(--coral-dark)"},
+  {name:"Numbers", pool:[...NUMBERS], kind:"trace", color:"var(--grass-dark)"},
+  {name:"Shapes", pool:[...SHAPES], kind:"trace", color:"var(--grape-dark)"},
+  {name:"Colors", pool:[...COLORS], kind:"pick", color:"var(--sky-dark)"}
+];
+
+const SHAPE_PATHS = {
+  Circle: "M60,10 Q15,10 15,60 Q15,110 60,110 Q105,110 105,60 Q105,10 60,10",
+  Square: "M15,15 L105,15 L105,105 L15,105 Z",
+  Triangle: "M60,10 L108,105 L12,105 Z",
+  Star: "M60,8 L74,45 L114,45 L82,68 L94,106 L60,83 L26,106 L38,68 L6,45 L46,45 Z",
+  Heart: "M60,105 C10,70 10,35 35,20 C50,11 60,25 60,35 C60,25 70,11 85,20 C110,35 110,70 60,105 Z",
+  Oval: "M60,22 Q10,22 10,60 Q10,98 60,98 Q110,98 110,60 Q110,22 60,22",
+  Diamond: "M60,10 L105,60 L60,110 L15,60 Z"
+};
+const LETTER_PATHS = {
+  A:"M15,120 L50,20 L85,120 M28,80 L72,80",
+  B:"M20,120 L20,20 L55,20 Q78,20 78,45 Q78,68 55,68 L20,68 M20,68 L58,68 Q80,68 80,94 Q80,120 58,120 L20,120",
+  C:"M85,40 Q65,18 42,18 Q15,18 15,70 Q15,122 42,122 Q65,122 85,100",
+  D:"M20,120 L20,20 L50,20 Q82,20 82,70 Q82,120 50,120 L20,120",
+  E:"M78,20 L20,20 L20,120 L78,120 M20,70 L60,70",
+  F:"M20,120 L20,20 L78,20 M20,70 L60,70",
+  G:"M85,40 Q65,18 42,18 Q15,18 15,70 Q15,122 42,122 Q68,122 80,105 L80,72 L52,72",
+  H:"M20,20 L20,120 M80,20 L80,120 M20,70 L80,70",
+  I:"M50,20 L50,120",
+  J:"M68,20 L68,95 Q68,122 42,122 Q20,122 20,100",
+  K:"M20,20 L20,120 M78,20 L20,72 L82,120",
+  L:"M25,20 L25,120 L78,120",
+  M:"M18,120 L18,20 L50,75 L82,20 L82,120",
+  N:"M20,120 L20,20 L80,120 L80,20",
+  O:"M50,18 Q15,18 15,70 Q15,122 50,122 Q85,122 85,70 Q85,18 50,18",
+  P:"M20,120 L20,20 L55,20 Q80,20 80,48 Q80,76 55,76 L20,76",
+  Q:"M50,18 Q15,18 15,70 Q15,122 50,122 Q85,122 85,70 Q85,18 50,18 M62,95 L88,124",
+  R:"M20,120 L20,20 L55,20 Q80,20 80,48 Q80,76 55,76 L20,76 M50,76 L82,120",
+  S:"M78,35 Q60,16 40,20 Q16,25 20,48 Q23,65 48,68 Q78,72 80,96 Q82,120 55,123 Q28,126 18,105",
+  T:"M14,20 L86,20 M50,20 L50,120",
+  U:"M20,20 L20,88 Q20,122 50,122 Q80,122 80,88 L80,20",
+  V:"M14,20 L50,120 L86,20",
+  W:"M8,20 L28,120 L50,55 L72,120 L92,20",
+  X:"M18,20 L82,120 M82,20 L18,120",
+  Y:"M14,20 L50,68 L86,20 M50,68 L50,120",
+  Z:"M15,20 L85,20 L15,120 L85,120"
+};
+const DIGIT_PATHS = {
+  "0":"M50,18 Q20,18 20,70 Q20,122 50,122 Q80,122 80,70 Q80,18 50,18",
+  "1":"M35,35 L55,20 L55,120 M35,120 L75,120",
+  "2":"M20,40 Q20,18 50,18 Q80,18 80,45 Q80,65 55,85 L20,120 L82,120",
+  "3":"M22,30 Q35,18 55,18 Q80,18 80,42 Q80,62 58,68 Q82,72 82,98 Q82,122 55,122 Q30,122 20,108",
+  "4":"M62,20 L20,85 L85,85 M65,20 L65,120",
+  "5":"M78,20 L25,20 L20,62 Q45,50 65,62 Q85,74 80,98 Q75,122 48,122 Q25,122 18,105",
+  "6":"M75,25 Q45,18 30,45 Q15,72 20,98 Q25,122 50,122 Q78,122 80,98 Q82,75 58,70 Q35,68 28,88",
+  "7":"M18,20 L84,20 L40,120",
+  "8":"M50,18 Q25,18 25,42 Q25,62 50,68 Q78,74 78,98 Q78,122 50,122 Q22,122 22,98 Q22,74 50,68 Q75,62 75,42 Q75,18 50,18",
+  "9":"M80,95 Q95,68 78,42 Q65,18 42,25 Q20,32 22,55 Q24,78 50,78 Q70,78 80,58"
+};
+
+function numberPath(n){
+  const s=String(n); const step=90; let d='';
+  s.split('').forEach((ch,i)=>{ d+=`<path class="guide" d="${DIGIT_PATHS[ch]||DIGIT_PATHS['0']}" transform="translate(${i*step},0)"/>`; });
+  return d;
+}
+let catIdx=0, qIdx=0, score=0, current=null, used=[], userPts=[], raf=null, strokes=[];
+
+function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+function init(){ used=CATEGORIES.map(cat=>shuffle([...cat.pool]).slice(0,5)); catIdx=0; qIdx=0; score=0; render(); }
+function catUsed(){ return used[catIdx]; }
+function currentItem(){ return catUsed()[qIdx]; }
+
+function render(){
+  const screen=document.getElementById('testScreen');
+  const finish=document.getElementById('finishScreen');
+  if(catIdx>=CATEGORIES.length){ screen.style.display='none'; finish.style.display='block'; showFinish(); return; }
+  screen.style.display='block'; finish.style.display='none';
+  current=currentItem();
+  const cat=CATEGORIES[catIdx];
+  document.getElementById('catPill').textContent=`${cat.name} — Question ${qIdx+1} of 5`;
+  document.getElementById('scoreText').textContent=`${score} / ${(catIdx*5)+qIdx}`;
+  // update dots
+  const dots=document.getElementById('testScreen').querySelectorAll('.score-dot'); // only first cat shown; skip
+  const qArea=document.getElementById('qArea');
+  const ctrl=document.getElementById('ctrlArea');
+  qArea.innerHTML=''; ctrl.innerHTML='';
+  if(cat.kind==='trace'){
+    let path, label, hint, guideHtml;
+    if(cat.name==='Letters'){ path=LETTER_PATHS[current]||LETTER_PATHS.A; label=current; hint=`Trace the letter ${current}`; guideHtml=`<path class="guide" d="${path}"></path>`; }
+    else if(cat.name==='Numbers'){ label=String(current); hint=`Trace the number ${current}`; guideHtml=numberPath(current); path=null; }
+    else { path=SHAPE_PATHS[current]||SHAPE_PATHS.Circle; label=current; hint=`Trace the ${current}`; guideHtml=`<path class="guide" d="${path}"></path>`; }
+    const vbW = cat.name==='Numbers' ? 100*String(current).length : 120;
+    qArea.innerHTML=`
+      <div class="qtext" style="color:${cat.color}">${label}</div>
+      <div class="qhint">${hint}</div>
+      <div class="trace-wrap">
+        <div class="trace-box">
+          <svg class="trace-canvas" viewBox="0 0 ${vbW} 140" preserveAspectRatio="xMidYMid meet">
+            ${guideHtml}
+            <path class="user" id="userPath" d=""></path>
+            <circle class="tip" id="pencilTip" r="6" cx="-30" cy="-30"></circle>
+          </svg>
+        </div>
+        <button class="btn clear-trace" onclick="clearTrace()">🧹 Clear</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      <button class="btn check-btn" onclick="checkTrace()">✅ I traced it!</button>
+    `;
+    userPts=[]; strokes=[]; document.getElementById('userPath').setAttribute('d','');
+    setupTrace();
+  } else {
+    const colorMap={Red:"#E8433A",Blue:"#2E86DE",Green:"#2FC29A",Yellow:"#FFC93C",Orange:"#FF8C3C",Purple:"#9B59D6"};
+    qArea.innerHTML=`
+      <div class="qtext" style="color:${colorMap[current]}">${current}</div>
+      <div class="qhint">Pick the button that matches this color</div>
+      <div class="options">${COLORS.map(c=>`<button class="opt" onclick="pickColor('${c}')">${c}</button>`).join('')}</div>
+    `;
+  }
+  let say="";
+  if(cat.name==='Letters') say=`Letter ${current}`;
+  else if(cat.name==='Numbers') say=`Number ${current}`;
+  else if(cat.name==='Shapes') say=`Trace the ${current}`;
+  else say=`${current}`;
+  speakThen(say);
+}
+
+function setupTrace(){
+  const svg=document.querySelector('.trace-canvas');
+  const user=document.getElementById('userPath');
+  const tip=document.getElementById('pencilTip');
+  let started=false, pts=[], d='';
+  /* strokes accumulates completed subpaths across multiple pen-downs */
+  const toSvg=(clientX,clientY)=>{
+    const p=svg.createSVGPoint();
+    p.x=clientX; p.y=clientY;
+    const ctm=svg.getScreenCTM().inverse();
+    const sp=p.matrixTransform(ctm);
+    return [sp.x,sp.y];
+  };
+  const down=(x,y)=>{
+    started=true; pts=[[x,y]]; userPts.push([x,y]);
+    tip.setAttribute('cx',x); tip.setAttribute('cy',y); tip.setAttribute('opacity','1');
+  };
+  const move=(x,y)=>{
+    if(!started) return;
+    pts.push([x,y]); userPts.push([x,y]);
+    /* build current stroke as smooth quadratic curves */
+    let stroke=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+    for(let i=0;i<pts.length-1;i++){
+      const cp=(pts[i][0]+pts[i+1][0])/2;
+      const cq=(pts[i][1]+pts[i+1][1])/2;
+      stroke+=` Q${pts[i][0].toFixed(1)},${pts[i][1].toFixed(1)} ${cp.toFixed(1)},${cq.toFixed(1)}`;
+    }
+    stroke+=` L${pts[pts.length-1][0].toFixed(1)},${pts[pts.length-1][1].toFixed(1)}`;
+    /* combine all previous strokes + current in-progress stroke */
+    user.setAttribute('d',strokes.join(' ')+' '+stroke);
+    tip.setAttribute('cx',x); tip.setAttribute('cy',y);
+  };
+  const up=()=>{
+    if(!started) return;
+    /* finalize current stroke */
+    let stroke=`M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`;
+    for(let i=0;i<pts.length-1;i++){
+      const cp=(pts[i][0]+pts[i+1][0])/2;
+      const cq=(pts[i][1]+pts[i+1][1])/2;
+      stroke+=` Q${pts[i][0].toFixed(1)},${pts[i][1].toFixed(1)} ${cp.toFixed(1)},${cq.toFixed(1)}`;
+    }
+    stroke+=` L${pts[pts.length-1][0].toFixed(1)},${pts[pts.length-1][1].toFixed(1)}`;
+    strokes.push(stroke);
+    pts=[]; d=''; started=false;
+    user.setAttribute('d',strokes.join(' '));
+  };
+  svg.addEventListener('mousedown',e=>{const [x,y]=toSvg(e.clientX,e.clientY);down(x,y);});
+  svg.addEventListener('mousemove',e=>{if(!started)return;const [x,y]=toSvg(e.clientX,e.clientY);move(x,y);});
+  svg.addEventListener('mouseup',up); svg.addEventListener('mouseleave',up);
+  svg.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];const [x,y]=toSvg(t.clientX,t.clientY);down(x,y);},{passive:false});
+  svg.addEventListener('touchmove',e=>{e.preventDefault();if(!started)return;const t=e.touches[0];const [x,y]=toSvg(t.clientX,t.clientY);move(x,y);},{passive:false});
+  svg.addEventListener('touchend',up);
+}
+function clearTrace(){ const u=document.getElementById('userPath'); u.setAttribute('d',''); userPts=[]; strokes.length=0; const t=document.getElementById('pencilTip'); t.setAttribute('cx','-30');t.setAttribute('cy','-30');t.setAttribute('opacity','0'); }
+function getPathLength(d){ const p=document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',d); return p.getTotalLength(); }
+function sampleGuide(d,n=40){ const p=document.createElementNS('http://www.w3.org/2000/svg','path'); p.setAttribute('d',d); const len=p.getTotalLength(); const pts=[]; for(let i=0;i<=n;i++){const pt=p.getPointAtLength(len*i/n);pts.push([pt.x,pt.y]);} return pts; }
+function checkTrace(){
+  const cat=CATEGORIES[catIdx];
+  let guidePaths=[];
+  if(cat.name==='Letters') guidePaths=[LETTER_PATHS[current]||LETTER_PATHS.A];
+  else if(cat.name==='Numbers') guidePaths=String(current).split('').map(ch=>DIGIT_PATHS[ch]||DIGIT_PATHS['0']);
+  else guidePaths=[SHAPE_PATHS[current]||SHAPE_PATHS.Circle];
+  const fb=document.getElementById('feedback');
+  const next=()=>{
+    qIdx++;
+    if(qIdx>=5){ catIdx++; qIdx=0; }
+    render();
+  };
+  if(userPts.length<6){ fb.textContent="⚠️ Draw the trace first!"; fb.style.color="var(--coral-dark)"; speakThen("Please draw the trace first",next); return; }
+  /* gather all guide points across every digit/shape, offset by digit index */
+  let guidePts=[];
+  guidePaths.forEach((p,di)=>{
+    const offX = cat.name==='Numbers' ? di*90 : 0;
+    const pts=sampleGuide(p,40);
+    pts.forEach(([x,y])=>guidePts.push([x+offX,y]));
+  });
+  let covered=0;
+  for(const g of guidePts){ let near=false; for(const u of userPts){ const dx=u[0]-g[0], dy=u[1]-g[1]; if(Math.hypot(dx,dy)<14){near=true;break;} } if(near) covered++; }
+  const pass = covered/guidePts.length >= 0.55;
+  if(pass){
+    score++;
+    fb.textContent="✅ Great tracing!";
+    fb.style.color="var(--grass-dark)";
+    speakThen("Great job!",next);
+  } else {
+    fb.textContent="❌ Try again — trace it once more!";
+    fb.style.color="var(--coral-dark)";
+    speakThen("Try again");
+    clearTrace();
+  }
+}
+function pickColor(c){
+  const ok = c===current;
+  if(ok){ score++; speak("Correct!"); } else { speak("Try again"); }
+  // highlight
+  const btns=document.querySelectorAll('.opt');
+  btns.forEach(b=>{ b.classList.remove('correct','wrong'); if(b.textContent===c) b.classList.add(ok?'correct':'wrong'); });
+  setTimeout(()=>{ qIdx++; if(qIdx>=5){ catIdx++; qIdx=0; } render(); }, 700);
+}
+function showFinish(){
+  document.getElementById('finalScore').textContent=`${score} / 20`;
+  const pct=Math.round(score/20*100);
+  document.getElementById('finalNote').textContent = pct>=80?`Amazing! You got ${pct}% — super star!` : `Good try! You got ${pct}%. Keep practicing!`;
+  spawnConfetti();
+}
+function spawnConfetti(){
+  const layer=document.getElementById('confetti'); layer.innerHTML='';
+  const bits=['🎉','⭐','🎈','✨','🌈','🎊','🏆'];
+  for(let i=0;i<26;i++){
+    const s=document.createElement('span'); s.className='confetti-piece'; s.textContent=bits[Math.floor(Math.random()*bits.length)];
+    s.style.left=(Math.random()*96+2)+'%'; s.style.animationDuration=(1.4+Math.random()*1.2)+'s'; s.style.animationDelay=(Math.random()*0.8)+'s';
+    layer.appendChild(s);
+  }
+}
+function resetTest(){ init(); }
+function goHome(){ window.location.href='index.html'; }
+
+/* ---------- AI voice ---------- */
+let voice=null;
+function pickVoice(){
+  const vs=window.speechSynthesis?window.speechSynthesis.getVoices():[];
+  if(!vs.length)return null;
+  const prefs=["Samantha","Victoria","Karen","Moira","Ava","Allison","Joanna","Salli","Kendra","Kimberly","Female","Google"];
+  for(const n of prefs){const v=vs.find(x=>x.name.indexOf(n)!==-1);if(v)return v;}
+  return vs.find(x=>/^en/i.test(x.lang))||vs[0];
+}
+function speak(txt){
+  if(!window.speechSynthesis)return null;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  if(!voice)voice=pickVoice();
+  if(voice)u.voice=voice;
+  u.rate=0.85;u.pitch=1.2;u.volume=1;
+  window.speechSynthesis.speak(u);
+  return u;
+}
+function speakThen(txt,cb){
+  const u=speak(txt);
+  if(!u){if(cb)cb();return;}
+  u.onend=()=>{if(cb)cb();};
+  u.onerror=()=>{if(cb)cb();};
+}
+if(window.speechSynthesis){voice=pickVoice();window.speechSynthesis.onvoiceschanged=()=>{voice=pickVoice();};}
+
+init();
+</script>
+</body>
+</html>
